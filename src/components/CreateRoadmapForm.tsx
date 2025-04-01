@@ -1,12 +1,13 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb, Wand2 } from 'lucide-react';
+
+const ACCENT_COLOR = '#F59E0B';
 
 export function CreateRoadmapForm() {
   const [skillName, setSkillName] = useState('');
@@ -45,51 +46,68 @@ export function CreateRoadmapForm() {
   };
   
   return (
-    <Card className="border-nextskill-light-gray bg-nextskill-darker-gray w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-xl text-white flex items-center gap-2">
-          <Lightbulb className="text-nextskill-orange" size={20} />
-          Create a New Skill Roadmap
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="skill-name" className="text-white font-medium">
-              Skill Name
-            </label>
-            <Input
-              id="skill-name"
-              placeholder="e.g., Machine Learning, Web Development, UX Design"
-              value={skillName}
-              onChange={(e) => setSkillName(e.target.value)}
-              className="bg-nextskill-light-gray border-nextskill-light-gray focus:border-nextskill-orange"
-              required
-            />
+    <div className="max-w-2xl mx-auto p-6">
+      <Card className="border-2 bg-white overflow-hidden">
+        <CardHeader className="space-y-4 pb-6">
+          <div className="flex items-center gap-3">
+            <div 
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: ACCENT_COLOR }}
+            >
+              <Lightbulb className="text-white" size={24} />
+            </div>
+            <div>
+              <CardTitle className="text-2xl font-bold text-gray-800">
+                Create a New Skill Roadmap
+              </CardTitle>
+              <CardDescription className="text-gray-600 mt-1">
+                Let AI help you create a personalized learning path
+              </CardDescription>
+            </div>
           </div>
-          
-          <div className="space-y-2">
-            <label htmlFor="additional-prompt" className="text-white font-medium">
-              Additional Details (Optional)
-            </label>
-            <Textarea
-              id="additional-prompt"
-              placeholder="Add any specific requirements or focus areas for your roadmap..."
-              value={additionalPrompt}
-              onChange={(e) => setAdditionalPrompt(e.target.value)}
-              className="bg-nextskill-light-gray border-nextskill-light-gray focus:border-nextskill-orange min-h-[150px]"
-            />
-          </div>
-          
-          <Button 
-            type="submit" 
-            className="w-full bg-nextskill-orange hover:bg-nextskill-orange/90"
-            disabled={isLoading}
-          >
-            {isLoading ? "Generating Roadmap..." : "Generate Roadmap"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </CardHeader>
+        
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label htmlFor="skill-name" className="text-sm font-medium text-gray-700">
+                What skill would you like to learn?
+              </label>
+              <Input
+                id="skill-name"
+                placeholder="e.g., Machine Learning, Web Development, UX Design"
+                value={skillName}
+                onChange={(e) => setSkillName(e.target.value)}
+                className="bg-white border-2 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F59E0B]"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="additional-prompt" className="text-sm font-medium text-gray-700">
+                Any specific requirements or focus areas? (Optional)
+              </label>
+              <Textarea
+                id="additional-prompt"
+                placeholder="Add details about your current level, goals, or specific areas you want to focus on..."
+                value={additionalPrompt}
+                onChange={(e) => setAdditionalPrompt(e.target.value)}
+                className="bg-white border-2 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F59E0B] min-h-[150px]"
+              />
+            </div>
+            
+            <Button 
+              type="submit" 
+              className="w-full text-white font-medium h-12 transition-all duration-300"
+              style={{ backgroundColor: ACCENT_COLOR }}
+              disabled={isLoading}
+            >
+              <Wand2 size={20} className="mr-2" />
+              {isLoading ? "Generating Your Roadmap..." : "Generate My Learning Path"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
