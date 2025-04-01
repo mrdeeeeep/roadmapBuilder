@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { Lightbulb, Wand2 } from 'lucide-react';
+import { generateRoadmap } from '@/lib/openai';
 
 const ACCENT_COLOR = '#F59E0B';
 
@@ -28,21 +29,32 @@ export function CreateRoadmapForm() {
       return;
     }
     
-    // In a real app, this would call the AI API to generate a roadmap
     setIsLoading(true);
     
-    // Simulating API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const roadmap = await generateRoadmap(skillName, additionalPrompt);
+      
+      // In a real app, you would save this to your backend
+      // For now, we'll store it in localStorage
+      const existingRoadmaps = JSON.parse(localStorage.getItem('roadmaps') || '[]');
+      localStorage.setItem('roadmaps', JSON.stringify([...existingRoadmaps, roadmap]));
       
       toast({
         title: "Success!",
         description: "Your roadmap has been created",
       });
       
-      // Redirect to roadmaps page
-      navigate('/roadmaps');
-    }, 2000);
+      // Redirect to the new roadmap
+      navigate(`/roadmap/${roadmap.id}`);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate roadmap",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -80,6 +92,7 @@ export function CreateRoadmapForm() {
                 onChange={(e) => setSkillName(e.target.value)}
                 className="bg-white border-2 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F59E0B]"
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -93,6 +106,7 @@ export function CreateRoadmapForm() {
                 value={additionalPrompt}
                 onChange={(e) => setAdditionalPrompt(e.target.value)}
                 className="bg-white border-2 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F59E0B] min-h-[150px]"
+                disabled={isLoading}
               />
             </div>
             

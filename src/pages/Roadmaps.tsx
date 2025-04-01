@@ -1,16 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { dummyRoadmaps } from '@/data/roadmaps';
 import { RoadmapCard } from '@/components/RoadmapCard';
 import { Button } from '@/components/ui/button';
 import { Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
+import { Roadmap } from '@/types/roadmap';
 
 export default function Roadmaps() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [allRoadmaps, setAllRoadmaps] = useState<Roadmap[]>([]);
   
-  const filteredRoadmaps = dummyRoadmaps.filter(roadmap => 
+  useEffect(() => {
+    // Combine dummy roadmaps with generated ones from localStorage
+    const storedRoadmaps = JSON.parse(localStorage.getItem('roadmaps') || '[]');
+    setAllRoadmaps([...dummyRoadmaps, ...storedRoadmaps]);
+  }, []);
+  
+  const filteredRoadmaps = allRoadmaps.filter(roadmap => 
     roadmap.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     roadmap.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
