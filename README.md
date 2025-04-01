@@ -17,7 +17,7 @@ Skill roadmap generator built with React and TypeScript, powered by an LLM.
 
 ## Setup
 
-1. Clone: `git clone [<repo-url>](https://github.com/mrdeeeeep/roadmapBuilder.git)`
+1. Clone: `git clone https://github.com/mrdeeeeep/roadmapBuilder.git`
 2. Install: `npm install`
 3. Configure LLM key in `.env` (see `.env.example`)
 4. Build: `npm run build`
