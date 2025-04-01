@@ -9,6 +9,8 @@ import {
   LogOut 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 interface SidebarMenuItemProps {
   to: string;
@@ -46,6 +48,27 @@ const SidebarMenuItem = ({ to, icon, label, count, color }: SidebarMenuItemProps
 };
 
 export function Sidebar() {
+  const location = useLocation();
+  const { signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await signOut();
+      if (error) throw error;
+      toast({
+        title: "Success",
+        description: "You have been signed out successfully.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to sign out",
+      });
+    }
+  };
+
   return (
     <aside className="w-[280px] bg-white h-full border-r border-gray-100 flex flex-col">
       <div className="p-6 border-b border-gray-100">
@@ -113,6 +136,7 @@ export function Sidebar() {
             <span>Settings</span>
           </Link>
           <button 
+            onClick={handleSignOut}
             className="w-full flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100/80 transition-colors"
           >
             <LogOut size={18} className="text-gray-500" />
