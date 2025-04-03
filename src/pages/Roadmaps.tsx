@@ -1,24 +1,64 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { RoadmapCard } from '@/components/RoadmapCard';
 import { Button } from '@/components/ui/button';
 import { Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
-import { Roadmap } from '@/types/roadmap';
+import { supabase } from '@/lib/supabase';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function Roadmaps() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [allRoadmaps] = useState<Roadmap[]>([]); // Initialize with an empty array
-  
-  const filteredRoadmaps = allRoadmaps.filter(roadmap => 
+  const [roadmaps, setRoadmaps] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchRoadmaps = async () => {
+      try {
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !sessionData.session) {
+          throw new Error("Unable to fetch user session. Please log in again.");
+        }
+        const userId = sessionData.session.user.id;
+
+        const { data, error } = await supabase
+          .from('roadmaps')
+          .select('*')
+          .eq('user_id', userId);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        setRoadmaps(data || []);
+      } catch (error) {
+        console.error("Error fetching roadmaps:", error);
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to fetch roadmaps",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoadmaps();
+  }, [toast]);
+
+  const handleDelete = (id: string) => {
+    setRoadmaps((prevRoadmaps) => prevRoadmaps.filter((roadmap) => roadmap.id !== id));
+  };
+
+  const filteredRoadmaps = roadmaps.filter(roadmap =>
     roadmap.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     roadmap.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  
+
   return (
     <div className="p-8 space-y-8">
-      {/* Sidebar and other layout components should not include dummy data */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -39,13 +79,19 @@ export default function Roadmaps() {
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredRoadmaps.map((roadmap, index) => (
-          <RoadmapCard key={roadmap.id} roadmap={roadmap} index={index} />
-        ))}
-      </div>
-      
-      {filteredRoadmaps.length === 0 && (
+      {loading ? (
+        <div className="text-center py-12">
+          <p className="text-gray-600">Loading roadmaps...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredRoadmaps.map((roadmap, index) => (
+            <RoadmapCard key={roadmap.id} roadmap={roadmap} index={index} onDelete={handleDelete} />
+          ))}
+        </div>
+      )}
+
+      {!loading && filteredRoadmaps.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-600">No roadmaps found matching your search.</p>
         </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   ChevronRight, 
@@ -11,6 +11,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/lib/supabase';
 
 interface SidebarMenuItemProps {
   to: string;
@@ -47,10 +48,44 @@ const SidebarMenuItem = ({ to, icon, label, count, color }: SidebarMenuItemProps
   );
 };
 
+const COLORS = ['#EF4444', '#3B82F6', '#F59E0B']; // Define the three app colors
+
 export function Sidebar() {
-  const location = useLocation();
+  const [roadmaps, setRoadmaps] = useState([]);
   const { signOut } = useAuth();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchRoadmaps = async () => {
+      try {
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !sessionData.session) {
+          throw new Error("Unable to fetch user session. Please log in again.");
+        }
+        const userId = sessionData.session.user.id;
+
+        const { data, error } = await supabase
+          .from('roadmaps')
+          .select('id, name')
+          .eq('user_id', userId);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        setRoadmaps(data || []);
+      } catch (error) {
+        console.error("Error fetching roadmaps for sidebar:", error);
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to fetch roadmaps",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchRoadmaps();
+  }, [toast]);
 
   const handleSignOut = async () => {
     try {
@@ -97,7 +132,15 @@ export function Sidebar() {
             <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2">
               My Roadmaps
             </h2>
-            {/* Removed dummy SidebarMenuItem entries */}
+            {roadmaps.map((roadmap, index) => (
+              <SidebarMenuItem 
+                key={roadmap.id}
+                to={`/roadmap/${roadmap.id}`}
+                label={roadmap.name}
+                color={COLORS[index % COLORS.length]} // Alternate colors
+                icon={<ChevronRight size={18} />}
+              />
+            ))}
             <Link 
               to="/create" 
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100/80 transition-colors mt-2"

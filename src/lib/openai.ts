@@ -99,7 +99,7 @@ Make sure to:
       // Add IDs and order to items
       const roadmap: GeneratedRoadmap = {
         id: crypto.randomUUID(),
-        name: parsedResponse.name,
+        name: parsedResponse.name.replace(/^Learning\s+/i, ''), // Remove "Learning" from the name
         description: parsedResponse.description,
         items: parsedResponse.items.map((item, index) => ({
           ...item,
@@ -121,4 +121,4 @@ Make sure to:
     }
     throw new Error('Failed to generate roadmap. Please try again.');
   }
-} 
+}
