@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { dummyRoadmaps } from '@/data/roadmaps';
+import { useState } from 'react';
 import { RoadmapCard } from '@/components/RoadmapCard';
 import { Button } from '@/components/ui/button';
 import { Plus, Search } from 'lucide-react';
@@ -10,13 +9,7 @@ import { Roadmap } from '@/types/roadmap';
 export default function Roadmaps() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [allRoadmaps, setAllRoadmaps] = useState<Roadmap[]>([]);
-  
-  useEffect(() => {
-    // Combine dummy roadmaps with generated ones from localStorage
-    const storedRoadmaps = JSON.parse(localStorage.getItem('roadmaps') || '[]');
-    setAllRoadmaps([...dummyRoadmaps, ...storedRoadmaps]);
-  }, []);
+  const [allRoadmaps] = useState<Roadmap[]>([]); // Initialize with an empty array
   
   const filteredRoadmaps = allRoadmaps.filter(roadmap => 
     roadmap.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -25,6 +18,7 @@ export default function Roadmaps() {
   
   return (
     <div className="p-8 space-y-8">
+      {/* Sidebar and other layout components should not include dummy data */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />

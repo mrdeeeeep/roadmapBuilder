@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { Lightbulb, Wand2 } from 'lucide-react';
 import { generateRoadmap } from '@/lib/openai';
+import { supabase } from '@/lib/supabase'; // Ensure Supabase client is imported
 
 const ACCENT_COLOR = '#F59E0B';
 
@@ -32,24 +33,95 @@ export function CreateRoadmapForm() {
     setIsLoading(true);
     
     try {
+      // Get the authenticated user's session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session) {
+        console.error("Error fetching session:", sessionError);
+        throw new Error("Unable to fetch user session. Please log in again.");
+      }
+      const user = sessionData.session.user;
+
+      // Ensure the user exists in the "users" table
+      const { data: existingUser, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (userError && userError.code === 'PGRST116') {
+        // User does not exist, insert the user
+        const { error: insertUserError } = await supabase.from('users').insert({
+          id: user.id,
+          email: user.email,
+        });
+
+        if (insertUserError) {
+          console.error("Error inserting user:", insertUserError);
+          throw new Error("Failed to insert user into the database.");
+        }
+      } else if (userError) {
+        console.error("Error fetching user:", userError);
+        throw new Error("Failed to fetch user from the database.");
+      }
+
       const roadmap = await generateRoadmap(skillName, additionalPrompt);
       
-      // In a real app, you would save this to your backend
-      // For now, we'll store it in localStorage
-      const existingRoadmaps = JSON.parse(localStorage.getItem('roadmaps') || '[]');
-      localStorage.setItem('roadmaps', JSON.stringify([...existingRoadmaps, roadmap]));
-      
+      // Save the roadmap to Supabase
+      const { data: roadmapData, error: roadmapError } = await supabase.from('roadmaps').insert({
+        id: roadmap.id,
+        name: roadmap.name,
+        description: roadmap.description,
+        user_id: user.id, // Use the fetched user ID
+      }).select().single();
+
+      if (roadmapError) {
+        console.error("Error inserting roadmap:", roadmapError);
+        throw new Error(roadmapError.message);
+      }
+
+      // Save roadmap items
+      for (const item of roadmap.items) {
+        const { data: itemData, error: itemError } = await supabase.from('roadmap_items').insert({
+          id: item.id,
+          roadmap_id: roadmapData.id,
+          title: item.title,
+          description: item.description,
+          time_estimate: item.timeEstimate,
+          step_order: item.order, // Updated to match the new column name
+        }).select().single();
+
+        if (itemError) {
+          console.error("Error inserting roadmap item:", itemError);
+          throw new Error(itemError.message);
+        }
+
+        // Save resources for each item
+        for (const resource of item.resources) {
+          const { error: resourceError } = await supabase.from('roadmap_resources').insert({
+            roadmap_item_id: itemData.id,
+            url: resource,
+            title: resource, // Assuming the resource title is the same as the URL for now
+          });
+
+          if (resourceError) {
+            console.error("Error inserting roadmap resource:", resourceError);
+            throw new Error(resourceError.message);
+          }
+        }
+      }
+
       toast({
         title: "Success!",
-        description: "Your roadmap has been created",
+        description: "Your roadmap has been created and saved to the database.",
       });
       
       // Redirect to the new roadmap
       navigate(`/roadmap/${roadmap.id}`);
     } catch (error) {
+      console.error("Error in handleSubmit:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate roadmap",
+        description: error instanceof Error ? error.message : "Failed to save roadmap",
         variant: "destructive"
       });
     } finally {

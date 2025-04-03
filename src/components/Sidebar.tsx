@@ -97,24 +97,7 @@ export function Sidebar() {
             <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2">
               My Roadmaps
             </h2>
-            <SidebarMenuItem 
-              to="/roadmap/1" 
-              label="Web Development" 
-              color="#EF4444"
-              icon={<span />}
-            />
-            <SidebarMenuItem 
-              to="/roadmap/2" 
-              label="Data Science" 
-              color="#3B82F6"
-              icon={<span />}
-            />
-            <SidebarMenuItem 
-              to="/roadmap/3" 
-              label="Mobile Development" 
-              color="#F59E0B"
-              icon={<span />}
-            />
+            {/* Removed dummy SidebarMenuItem entries */}
             <Link 
               to="/create" 
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100/80 transition-colors mt-2"
