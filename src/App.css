@@ -1,3 +1,5 @@
+/* Import the "Poppins" font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 #root {
   width: 100%;
@@ -8,11 +10,15 @@
 }
 
 body, html {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #ffffff;
-  color: #171717;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  background-color: #f9f9f9;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .page-container {
@@ -143,4 +149,14 @@ body, html {
 
 .roadmap-item:last-child .roadmap-connector {
   display: none;
+}
+
+/* Ensure all text elements inherit the font */
+h1, h2, h3, h4, h5, h6, p, span, label, button, input, textarea {
+  font-family: inherit;
+}
+
+/* Adjust button and input styles for a rounded and cute look */
+button, input, textarea {
+  border-radius: 8px;
 }

@@ -36,66 +36,67 @@ const StyledWrapper = styled.div`
   z-index: 10;
 
   .loader {
+    width: 48px;
+    height: 48px;
+    margin: auto;
     position: relative;
-    width: 2.5em;
-    height: 2.5em;
-    transform: rotate(165deg);
-  }
-
-  .loader:before,
-  .loader:after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    display: block;
-    width: 0.5em;
-    height: 0.5em;
-    border-radius: 0.25em;
-    transform: translate(-50%, -50%);
   }
 
   .loader:before {
-    animation: before8 2s infinite;
+    content: '';
+    width: 48px;
+    height: 5px;
+    background: #f0808050;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    border-radius: 50%;
+    animation: shadow324 0.5s linear infinite;
   }
 
   .loader:after {
-    animation: after6 2s infinite;
+    content: '';
+    width: 100%;
+    height: 100%;
+    background: #f08080;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 4px;
+    animation: jump7456 0.5s linear infinite;
   }
 
-  @keyframes before8 {
-    0% {
-      width: 0.5em;
-      box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75);
+  @keyframes jump7456 {
+    15% {
+      border-bottom-right-radius: 3px;
     }
-    35% {
-      width: 2.5em;
-      box-shadow: 0 -0.5em rgba(225, 20, 98, 0.75), 0 0.5em rgba(111, 202, 220, 0.75);
+
+    25% {
+      transform: translateY(9px) rotate(22.5deg);
     }
-    70% {
-      width: 0.5em;
-      box-shadow: -1em -0.5em rgba(225, 20, 98, 0.75), 1em 0.5em rgba(111, 202, 220, 0.75);
+
+    50% {
+      transform: translateY(18px) scale(1, 0.9) rotate(45deg);
+      border-bottom-right-radius: 40px;
     }
+
+    75% {
+      transform: translateY(9px) rotate(67.5deg);
+    }
+
     100% {
-      box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75);
+      transform: translateY(0) rotate(90deg);
     }
   }
 
-  @keyframes after6 {
-    0% {
-      height: 0.5em;
-      box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75);
-    }
-    35% {
-      height: 2.5em;
-      box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75), -0.5em 0 rgba(233, 169, 32, 0.75);
-    }
-    70% {
-      height: 0.5em;
-      box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75), -0.5em 1em rgba(233, 169, 32, 0.75);
-    }
+  @keyframes shadow324 {
+    0%,
     100% {
-      box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75);
+      transform: scale(1, 1);
+    }
+
+    50% {
+      transform: scale(1.2, 1);
     }
   }
 
@@ -108,7 +109,7 @@ const StyledWrapper = styled.div`
   }
 
   @keyframes fadeText {
-    0%, 100% {
+     0%, 100% {
       opacity: 1;
     }
     50% {

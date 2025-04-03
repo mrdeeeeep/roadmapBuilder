@@ -5,7 +5,8 @@ interface RoadmapTimelineProps {
   items: RoadmapItem[];
 }
 
-const COLORS = ['#EF4444', '#3B82F6', '#F59E0B'];
+const COLORS = ['#EF4444', '#3B82F6', '#F59E0B']; // Base colors
+const LIGHT_COLORS = ['#FEE2E2', '#DBEAFE', '#FEF3C7']; // Lighter versions of the colors
 
 export function RoadmapTimeline({ items }: RoadmapTimelineProps) {
   const sortedItems = [...items].sort((a, b) => a.order - b.order);
@@ -30,7 +31,12 @@ export function RoadmapTimeline({ items }: RoadmapTimelineProps) {
               <span className="text-white">{item.order}</span>
             </div>
             
-            <div className="bg-white rounded-2xl p-6 border-2 shadow-sm hover:shadow-md transition-all duration-300">
+            <div 
+              className="rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300"
+              style={{
+                backgroundColor: LIGHT_COLORS[colorIndex], // Use lighter color for the tile background
+              }}
+            >
               <div className="flex items-center gap-3 mb-3">
                 <h3 className="text-xl font-bold text-gray-800">{item.title}</h3>
                 <ArrowRight size={20} className="text-gray-400" />
