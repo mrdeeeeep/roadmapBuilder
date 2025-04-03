@@ -3,7 +3,7 @@
 Skill roadmap generator built with React and TypeScript, powered by an LLM.
 
 ## Features
-
+- Authentication via Supabase
 - Text-based skill roadmap generation via LLM.
 - Customizable parameters for time and experience.
 - Export functionality (text, PDF, link).
@@ -12,8 +12,8 @@ Skill roadmap generator built with React and TypeScript, powered by an LLM.
 ## Tech Stack
 
 - React (TypeScript)
-- LLM integration
-- JSON-based data flow
+- Supabase
+- LLM api integration
 
 ## Setup
 
