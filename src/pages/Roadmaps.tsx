@@ -26,14 +26,26 @@ export default function Roadmaps() {
 
         const { data, error } = await supabase
           .from('roadmaps')
-          .select('*')
+          .select(`
+            id,
+            name,
+            description,
+            roadmap_items (id)
+          `)
           .eq('user_id', userId);
 
         if (error) {
           throw new Error(error.message);
         }
 
-        setRoadmaps(data || []);
+        // Count the number of steps for each roadmap
+        const roadmapsWithStepCount = data.map((roadmap) => ({
+          ...roadmap,
+          stepCount: roadmap.roadmap_items?.length || 0, // Count the steps
+        }));
+
+        console.log('Fetched roadmaps with step counts:', roadmapsWithStepCount); // Debugging log
+        setRoadmaps(roadmapsWithStepCount || []);
       } catch (error) {
         console.error("Error fetching roadmaps:", error);
         toast({
@@ -75,7 +87,7 @@ export default function Roadmaps() {
         
         <Button 
           onClick={() => navigate('/create')}
-          className="bg-[#3B82F6] hover:bg-[#3B82F6]/90 text-white font-medium px-6"
+          className="bg-[#3B82F6] hover:bg-[#3B82F6]/90 text-white font-medium px-6 rounded-full"
         >
           <Plus size={20} className="mr-2" />
           Create New Roadmap
@@ -89,7 +101,12 @@ export default function Roadmaps() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredRoadmaps.map((roadmap, index) => (
-            <RoadmapCard key={roadmap.id} roadmap={roadmap} index={index} onDelete={handleDelete} />
+            <RoadmapCard
+              key={roadmap.id}
+              roadmap={{ ...roadmap, stepCount: roadmap.stepCount }} // Pass step count to the card
+              index={index}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       )}

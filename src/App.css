@@ -29,7 +29,7 @@ body, html {
 
 .task-container {
   background-color: #ffffff;
-  border-radius: 8px;
+  border-radius: 16px; /* Increased border-radius for a more rounded look */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e5e5;
   overflow: hidden;
@@ -80,7 +80,7 @@ body, html {
   align-items: center;
   gap: 12px;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 16px; /* Increased border-radius for a more rounded look */
   color: #525252;
   font-size: 14px;
   transition: all 0.2s ease;
@@ -129,13 +129,14 @@ body, html {
 /* App Card */
 .app-card {
   background-color: #ffffff;
-  border-radius: 8px;
+  border-radius: 16px; /* Increased border-radius for a more rounded look */
   border: 1px solid #e5e5e5;
 }
 
 /* Roadmap Timeline */
 .roadmap-item {
   position: relative;
+  border-radius: 16px; /* Increased border-radius for a more rounded look */
 }
 
 .roadmap-connector {
@@ -158,5 +159,20 @@ h1, h2, h3, h4, h5, h6, p, span, label, button, input, textarea {
 
 /* Adjust button and input styles for a rounded and cute look */
 button, input, textarea {
-  border-radius: 8px;
+  border-radius: 16px; /* Increased border-radius for inputs and textareas */
+}
+
+/* Make all buttons rounded */
+button {
+  border-radius: 16px; /* Increased border-radius for buttons */
+}
+
+/* Ensure inputs and textareas are also rounded */
+input, textarea {
+  border-radius: 16px; /* Increased border-radius for inputs and textareas */
+}
+
+/* Make all tiles rounded */
+.app-card, .roadmap-item, .task-container, .sidebar-menu-item, .card {
+  border-radius: 16px; /* Increased border-radius for a more rounded look */
 }

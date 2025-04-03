@@ -85,13 +85,6 @@ Please provide a structured response in the following JSON format:
           "timeEstimate": "Estimated time (e.g., '2 hours')",
           "difficulty": "Beginner/Intermediate/Advanced",
           "expectedOutcome": "What the learner will achieve after completing this subtask."
-        },
-        {
-          "title": "Subtask title",
-          "description": "Another detailed subtask description.",
-          "timeEstimate": "Estimated time (e.g., '3 hours')",
-          "difficulty": "Beginner/Intermediate/Advanced",
-          "expectedOutcome": "What the learner will achieve after completing this subtask."
         }
       ],
       "resources": ["Resource 1", "Resource 2"]
@@ -100,7 +93,7 @@ Please provide a structured response in the following JSON format:
 }
 
 Make sure to:
-1. Break down the learning path into logical steps and subtasks.
+1. Break down the learning path into **at least 5-10 steps** and subtasks.
 2. Include practical exercises, projects, and real-world applications.
 3. Provide time estimates, difficulty levels, prerequisites, and expected outcomes for each step and subtask.
 4. Suggest relevant learning resources (e.g., books, articles, videos, or courses).
@@ -120,7 +113,7 @@ Make sure to:
         },
       ],
       temperature: 0.7,
-      max_tokens: 3500, // Increased max tokens to allow for more detailed responses
+      max_tokens: 4000, // Increased max tokens to allow for more detailed responses
     });
 
     if (!completion.choices || !completion.choices[0]?.message?.content) {
@@ -129,8 +122,16 @@ Make sure to:
 
     const response = completion.choices[0].message.content;
 
+    // Check if the response is complete
+    if (!response.trim().endsWith('}')) {
+      console.error('Truncated AI response:', response);
+      throw new Error('The AI response was truncated. Please try again.');
+    }
+
     try {
       const parsedResponse = JSON.parse(response.trim()) as RoadmapResponse;
+
+      console.log('Generated roadmap response:', parsedResponse); // Debugging log
 
       // Validate the response structure
       if (!parsedResponse.name || !parsedResponse.description || !Array.isArray(parsedResponse.items)) {
@@ -184,6 +185,8 @@ Make sure to:
           })) || [],
         })),
       };
+
+      console.log('Final roadmap object to save:', roadmap); // Debugging log
 
       return roadmap;
     } catch (parseError) {

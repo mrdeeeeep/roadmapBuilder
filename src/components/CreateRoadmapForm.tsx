@@ -184,6 +184,8 @@ export function CreateRoadmapForm() {
       }
 
       const roadmap = await generateRoadmap(skillName, additionalPrompt);
+
+      console.log('Roadmap to save:', roadmap); // Debugging log
       
       // Save the roadmap to Supabase
       const { data: roadmapData, error: roadmapError } = await supabase.from('roadmaps').insert({
@@ -198,6 +200,8 @@ export function CreateRoadmapForm() {
         console.error("Error inserting roadmap:", roadmapError);
         throw new Error(roadmapError.message);
       }
+
+      console.log('Saved roadmap data:', roadmapData); // Debugging log
 
       // Save roadmap items
       for (const item of roadmap.items) {
@@ -214,6 +218,8 @@ export function CreateRoadmapForm() {
           console.error("Error inserting roadmap item:", itemError);
           throw new Error(itemError.message);
         }
+
+        console.log('Saved roadmap item:', itemData); // Debugging log
 
         // Save resources for each item
         for (const resource of item.resources) {

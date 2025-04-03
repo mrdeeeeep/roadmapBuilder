@@ -32,7 +32,7 @@ export function RoadmapTimeline({ items }: RoadmapTimelineProps) {
             </div>
             
             <div 
-              className="rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300"
+              className="rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300" // Added rounded-2xl for rounded corners
               style={{
                 backgroundColor: LIGHT_COLORS[colorIndex], // Use lighter color for the tile background
               }}

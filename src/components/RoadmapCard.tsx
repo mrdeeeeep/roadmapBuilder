@@ -18,6 +18,7 @@ interface RoadmapCardProps {
 
 const COLORS = ['#EF4444', '#3B82F6', '#F59E0B'];
 const ICONS = [BookOpen, Code, Brain, Rocket, Lightbulb];
+const LIGHT_COLORS = ['#FEE2E2', '#DBEAFE', '#FEF3C7']; // Lighter versions of the colors
 
 export function RoadmapCard({ roadmap, index, onDelete }: RoadmapCardProps) {
   const { toast } = useToast();
@@ -48,17 +49,19 @@ export function RoadmapCard({ roadmap, index, onDelete }: RoadmapCardProps) {
     }
   };
 
-  const totalSteps = roadmap.items?.length || 0;
   const colorIndex = index % COLORS.length;
   const IconComponent = ICONS[index % ICONS.length];
 
   return (
     <div className="relative">
       <Link to={`/roadmap/${roadmap.id}`}>
-        <Card className="h-full cursor-pointer transition-all duration-300 hover:scale-[1.02] bg-white border-2 group">
+        <Card
+          className="h-full cursor-pointer transition-all duration-300 hover:scale-[1.02] group rounded-2xl" // Added rounded-2xl for rounded corners
+          style={{ backgroundColor: LIGHT_COLORS[colorIndex] }} // Use lighter color for the tile background
+        >
           <CardHeader className="relative pb-8">
-            <div 
-              className="absolute left-4 top-4 w-16 h-16 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+            <div
+              className="absolute left-4 top-4 w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
               style={{ backgroundColor: COLORS[colorIndex] }}
             >
               <IconComponent size={32} className="text-white" />
@@ -71,14 +74,17 @@ export function RoadmapCard({ roadmap, index, onDelete }: RoadmapCardProps) {
             <p className="text-gray-600 mb-4 line-clamp-2">{roadmap.description}</p>
             <div className="flex items-center gap-2 text-sm text-gray-700">
               <Clock size={16} style={{ color: COLORS[colorIndex] }} />
-              <span className="font-medium">{totalSteps ? `${totalSteps} steps` : 'No steps available'}</span>
+              <span className="font-medium">
+                {roadmap.stepCount > 0 ? `${roadmap.stepCount} steps` : 'No steps available'}
+              </span>
             </div>
           </CardContent>
         </Card>
       </Link>
       <button
         onClick={() => setShowConfirmDialog(true)}
-        className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+        className="absolute top-4 right-4 text-white p-2 rounded-full hover:opacity-90 transition-colors"
+        style={{ backgroundColor: COLORS[colorIndex] }} // Match delete button color to the tile's associated color
         title="Delete Roadmap"
       >
         <Trash size={16} />
@@ -102,7 +108,7 @@ export function RoadmapCard({ roadmap, index, onDelete }: RoadmapCardProps) {
               <button
                 onClick={handleDelete}
                 className="px-4 py-2 rounded-md text-white"
-                style={{ backgroundColor: COLORS[colorIndex] }}
+                style={{ backgroundColor: COLORS[colorIndex] }} // Match delete button color to the tile's associated color
               >
                 Delete
               </button>

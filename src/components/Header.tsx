@@ -71,7 +71,7 @@ export function Header() {
         <Button 
           variant="ghost" 
           size="icon" 
-          className="w-10 h-10 rounded-full hover:bg-gray-100"
+          className="w-10 h-10 rounded-full hover:bg-gray-100" // Ensured buttons are rounded
         >
           <Bell size={20} className="text-gray-600" />
         </Button>
@@ -79,7 +79,7 @@ export function Header() {
         <Button 
           variant="ghost" 
           size="icon" 
-          className="w-10 h-10 rounded-full hover:bg-gray-100 relative"
+          className="w-10 h-10 rounded-full hover:bg-gray-100 relative" // Ensured buttons are rounded
           onClick={(e) => {
             e.stopPropagation(); // Prevent the click from propagating to the document
             handleAvatarClick();

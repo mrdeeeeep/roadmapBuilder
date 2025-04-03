@@ -58,6 +58,8 @@ export default function RoadmapDetail() {
           throw new Error(error.message);
         }
 
+        console.log('Fetched roadmap data:', data); // Debugging log
+
         // Transform the data to match the expected structure for RoadmapTimeline
         interface RoadmapItemRaw {
           id: string;
@@ -78,6 +80,8 @@ export default function RoadmapDetail() {
           subtasks: item.subtasks || [], // Add subtasks
           resources: item.roadmap_resources.map((resource) => resource.url),
         }));
+
+        console.log('Transformed roadmap items:', transformedItems); // Debugging log
 
         setRoadmap({
           id: data.id,
