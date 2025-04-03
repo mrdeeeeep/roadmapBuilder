@@ -12,6 +12,7 @@ export default function RoadmapDetail() {
     description: string;
     timeEstimate: number;
     order: number;
+    subtasks?: string[]; // Add subtasks
     resources: string[];
   }
 
@@ -19,6 +20,7 @@ export default function RoadmapDetail() {
     id: string;
     name: string;
     description: string;
+    totalTime?: number; // Add total time
     items: RoadmapItem[];
   }
 
@@ -32,16 +34,21 @@ export default function RoadmapDetail() {
         const { data, error } = await supabase
           .from('roadmaps')
           .select(`
-            id, 
-            name, 
-            description, 
+            id,
+            name,
+            description,
+            total_time,
             roadmap_items (
-              id, 
-              title, 
-              description, 
-              time_estimate, 
+              id,
+              title,
+              description,
+              time_estimate,
               step_order,
-              roadmap_resources (url, title)
+              subtasks,
+              roadmap_resources (
+                url,
+                title
+              )
             )
           `)
           .eq('id', id)
@@ -58,6 +65,7 @@ export default function RoadmapDetail() {
           description: string;
           time_estimate: number;
           step_order: number;
+          subtasks?: string[]; // Add subtasks
           roadmap_resources: { url: string; title: string }[];
         }
 
@@ -67,6 +75,7 @@ export default function RoadmapDetail() {
           description: item.description,
           timeEstimate: item.time_estimate.toString(), // Convert to string
           order: item.step_order, // Updated to use "step_order"
+          subtasks: item.subtasks || [], // Add subtasks
           resources: item.roadmap_resources.map((resource) => resource.url),
         }));
 
@@ -74,6 +83,7 @@ export default function RoadmapDetail() {
           id: data.id,
           name: data.name,
           description: data.description,
+          totalTime: data.total_time, // Ensure total_time is retrieved and set
           items: transformedItems,
         });
       } catch (error) {
@@ -111,6 +121,9 @@ export default function RoadmapDetail() {
     <div className="p-8 space-y-8">
       <h1 className="text-3xl font-bold text-gray-800">{roadmap.name}</h1>
       <p className="text-gray-600">{roadmap.description}</p>
+      <p className="text-gray-600 font-medium">
+        Total Time: {roadmap.totalTime || 'Not available'}
+      </p>
       <RoadmapTimeline items={roadmap.items} />
     </div>
   );

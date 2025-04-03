@@ -50,41 +50,69 @@ const SidebarMenuItem = ({ to, icon, label, count, color }: SidebarMenuItemProps
 
 const COLORS = ['#EF4444', '#3B82F6', '#F59E0B']; // Define the three app colors
 
+let fetchRoadmaps: () => Promise<void>; // Declare fetchRoadmaps for external use
+
 export function Sidebar() {
   const [roadmaps, setRoadmaps] = useState([]);
   const { signOut } = useAuth();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchRoadmaps = async () => {
-      try {
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError || !sessionData.session) {
-          throw new Error("Unable to fetch user session. Please log in again.");
-        }
-        const userId = sessionData.session.user.id;
-
-        const { data, error } = await supabase
-          .from('roadmaps')
-          .select('id, name')
-          .eq('user_id', userId);
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        setRoadmaps(data || []);
-      } catch (error) {
-        console.error("Error fetching roadmaps for sidebar:", error);
-        toast({
-          title: "Error",
-          description: error instanceof Error ? error.message : "Failed to fetch roadmaps",
-          variant: "destructive",
-        });
+  fetchRoadmaps = async () => {
+    try {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session) {
+        throw new Error("Unable to fetch user session. Please log in again.");
       }
-    };
+      const userId = sessionData.session.user.id;
 
+      const { data, error } = await supabase
+        .from('roadmaps')
+        .select('id, name')
+        .eq('user_id', userId);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setRoadmaps(data || []);
+    } catch (error) {
+      console.error("Error fetching roadmaps for sidebar:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to fetch roadmaps",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
     fetchRoadmaps();
+
+    // Subscribe to real-time updates for the roadmaps table
+    const subscription = supabase
+      .channel('roadmaps')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'roadmaps' },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setRoadmaps((prev) => [...prev, payload.new]);
+          } else if (payload.eventType === 'DELETE') {
+            setRoadmaps((prev) => prev.filter((roadmap) => roadmap.id !== payload.old.id));
+          } else if (payload.eventType === 'UPDATE') {
+            setRoadmaps((prev) =>
+              prev.map((roadmap) =>
+                roadmap.id === payload.new.id ? { ...roadmap, ...payload.new } : roadmap
+              )
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, [toast]);
 
   const handleSignOut = async () => {
@@ -176,3 +204,6 @@ export function Sidebar() {
     </aside>
   );
 }
+
+// Export fetchRoadmaps for external use
+export { fetchRoadmaps as reloadSidebarRoadmaps };

@@ -84,12 +84,14 @@ export function RoadmapCard({ roadmap, index, onDelete }: RoadmapCardProps) {
         <Trash size={16} />
       </button>
 
-      {/* Confirmation Dialog */}
+      {/* Styled Confirmation Dialog */}
       {showConfirmDialog && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-          <div className="bg-white rounded-lg p-6 shadow-lg w-80">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Confirm Deletion</h3>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete the roadmap "{roadmap.name}"?</p>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg w-96">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Confirm Deletion</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete the roadmap <span className="font-semibold">{roadmap.name}</span>? This action cannot be undone.
+            </p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowConfirmDialog(false)}
@@ -99,7 +101,8 @@ export function RoadmapCard({ roadmap, index, onDelete }: RoadmapCardProps) {
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+                className="px-4 py-2 rounded-md text-white"
+                style={{ backgroundColor: COLORS[colorIndex] }}
               >
                 Delete
               </button>

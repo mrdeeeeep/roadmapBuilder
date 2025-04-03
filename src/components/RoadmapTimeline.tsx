@@ -9,14 +9,14 @@ const COLORS = ['#EF4444', '#3B82F6', '#F59E0B'];
 
 export function RoadmapTimeline({ items }: RoadmapTimelineProps) {
   const sortedItems = [...items].sort((a, b) => a.order - b.order);
-  
+
   return (
     <div className="space-y-12 relative px-8 py-8">
       <div className="absolute left-[47px] top-[72px] bottom-8 w-0.5 bg-gray-200" />
       
       {sortedItems.map((item, index) => {
         const colorIndex = index % COLORS.length;
-        
+
         return (
           <div 
             key={item.id} 
@@ -42,7 +42,22 @@ export function RoadmapTimeline({ items }: RoadmapTimelineProps) {
                 <Clock size={16} style={{ color: COLORS[colorIndex] }} />
                 <span className="font-medium">Estimated time: {item.timeEstimate}</span>
               </div>
-              
+
+              {item.subtasks && item.subtasks.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <h4 className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-2">
+                    Subtasks
+                  </h4>
+                  <ul className="space-y-2">
+                    {item.subtasks.map((subtask, i) => (
+                      <li key={i} className="text-gray-600 text-sm">
+                        - {subtask.title} ({subtask.timeEstimate})
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {item.resources && item.resources.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <h4 className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-2">

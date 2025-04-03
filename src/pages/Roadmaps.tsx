@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
+import { reloadSidebarRoadmaps } from '@/components/Sidebar';
 
 export default function Roadmaps() {
   const navigate = useNavigate();
@@ -50,6 +51,8 @@ export default function Roadmaps() {
 
   const handleDelete = (id: string) => {
     setRoadmaps((prevRoadmaps) => prevRoadmaps.filter((roadmap) => roadmap.id !== id));
+    // Reload the sidebar roadmaps
+    reloadSidebarRoadmaps();
   };
 
   const filteredRoadmaps = roadmaps.filter(roadmap =>

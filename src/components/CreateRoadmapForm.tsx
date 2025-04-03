@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Lightbulb, Wand2 } from 'lucide-react';
 import { generateRoadmap } from '@/lib/openai';
 import { supabase } from '@/lib/supabase'; // Ensure Supabase client is imported
+import { reloadSidebarRoadmaps } from '@/components/Sidebar';
 
 const ACCENT_COLOR = '#F59E0B';
 
@@ -72,6 +73,7 @@ export function CreateRoadmapForm() {
         name: roadmap.name,
         description: roadmap.description,
         user_id: user.id, // Use the fetched user ID
+        total_time: roadmap.totalTime, // Save total time
       }).select().single();
 
       if (roadmapError) {
@@ -114,7 +116,10 @@ export function CreateRoadmapForm() {
         title: "Success!",
         description: "Your roadmap has been created and saved to the database.",
       });
-      
+
+      // Reload the sidebar roadmaps
+      reloadSidebarRoadmaps();
+
       // Redirect to the new roadmap
       navigate(`/roadmap/${roadmap.id}`);
     } catch (error) {
