@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,30 +9,147 @@ import { Lightbulb, Wand2 } from 'lucide-react';
 import { generateRoadmap } from '@/lib/openai';
 import { supabase } from '@/lib/supabase'; // Ensure Supabase client is imported
 import { reloadSidebarRoadmaps } from '@/components/Sidebar';
+import styled from 'styled-components';
 
 const ACCENT_COLOR = '#F59E0B';
+
+const Loader = ({ text }: { text: string }) => {
+  return (
+    <StyledWrapper>
+      <div className="loader" />
+      <p className="loader-text">{text}</p>
+    </StyledWrapper>
+  );
+};
+
+const StyledWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+
+  .loader {
+    position: relative;
+    width: 2.5em;
+    height: 2.5em;
+    transform: rotate(165deg);
+  }
+
+  .loader:before,
+  .loader:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 0.25em;
+    transform: translate(-50%, -50%);
+  }
+
+  .loader:before {
+    animation: before8 2s infinite;
+  }
+
+  .loader:after {
+    animation: after6 2s infinite;
+  }
+
+  @keyframes before8 {
+    0% {
+      width: 0.5em;
+      box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75);
+    }
+    35% {
+      width: 2.5em;
+      box-shadow: 0 -0.5em rgba(225, 20, 98, 0.75), 0 0.5em rgba(111, 202, 220, 0.75);
+    }
+    70% {
+      width: 0.5em;
+      box-shadow: -1em -0.5em rgba(225, 20, 98, 0.75), 1em 0.5em rgba(111, 202, 220, 0.75);
+    }
+    100% {
+      box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75);
+    }
+  }
+
+  @keyframes after6 {
+    0% {
+      height: 0.5em;
+      box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75);
+    }
+    35% {
+      height: 2.5em;
+      box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75), -0.5em 0 rgba(233, 169, 32, 0.75);
+    }
+    70% {
+      height: 0.5em;
+      box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75), -0.5em 1em rgba(233, 169, 32, 0.75);
+    }
+    100% {
+      box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75);
+    }
+  }
+
+  .loader-text {
+    margin-top: 1rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #333;
+    animation: fadeText 1.5s infinite;
+  }
+
+  @keyframes fadeText {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+`;
 
 export function CreateRoadmapForm() {
   const [skillName, setSkillName] = useState('');
   const [additionalPrompt, setAdditionalPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('Creating...');
+
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setLoadingText((prev) => (prev === 'Creating...' ? 'Almost there...' : 'Creating...'));
+      }, 1500);
+
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!skillName.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a skill name",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Please enter a skill name',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       // Get the authenticated user's session
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -133,11 +250,12 @@ export function CreateRoadmapForm() {
       setIsLoading(false);
     }
   };
-  
+
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <Card className="border-2 bg-white overflow-hidden">
-        <CardHeader className="space-y-4 pb-6">
+    <div className="max-w-2xl mx-auto p-6 relative">
+      {isLoading && <Loader text={loadingText} />}
+      <Card className={`border-2 bg-white overflow-hidden ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+        <CardHeader className="space-y-4 pb-6 relative">
           <div className="flex items-center gap-3">
             <div 
               className="w-12 h-12 rounded-xl flex items-center justify-center"
